@@ -18,6 +18,11 @@ public class EmployeeDataController {
         return employeeDataService.getAllEmployees();
     }
 
+    @GetMapping("findById/{id}")
+    public Mono<EmployeeData> findById(@PathVariable int id){
+        return employeeDataService.getEmployeeById(id);
+    }
+
     @DeleteMapping("deleteEmployee/{id}")
     public Mono<Void> getAllEmployees(@PathVariable int id){
         return employeeDataService.deleteEmployee(id);

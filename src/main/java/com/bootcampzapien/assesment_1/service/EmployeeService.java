@@ -1,9 +1,9 @@
 package com.bootcampzapien.assesment_1.service;
 
-import com.bootcampzapien.assesment_1.dto.Employee;
-import com.bootcampzapien.assesment_1.entity.EmployeeData;
-import com.bootcampzapien.assesment_1.entity.Skill;
+import com.bootcampzapien.assesment_1.dto.RequestDto;
+import com.bootcampzapien.assesment_1.dto.ResponseDto;
 import com.bootcampzapien.assesment_1.mapper.DaoMapper;
+import com.bootcampzapien.assesment_1.mapper.DtoMapper;
 import com.bootcampzapien.assesment_1.repository.EmployeeDataRepository;
 import com.bootcampzapien.assesment_1.repository.SkillRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,50 +12,46 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class EmployeeService {
-
     @Autowired
     private EmployeeDataRepository employeeDataRepository;
-
     @Autowired
     private SkillRepository skillRepository;
-
     @Autowired
     private DaoMapper daoMapper;
+    @Autowired
+    private DtoMapper dtoMapper;
 
     /**
      * creates a new employee
      *
-     * @param newEmployeeDto
+     * @param newRequestDtoDto
      * @return Employee mono
      */
-    public Mono<Employee> createEmployee(Employee newEmployeeDto) {
-//        EmployeeData newEmployeeData = new EmployeeData(
-//                newEmployeeDto.getEmp_id(),
-//                newEmployeeDto.getEmp_name(),
-//                newEmployeeDto.getEmp_city(),
-//                newEmployeeDto.getEmp_phone());
-//        Skill newSkill = new Skill(
-//                newEmployeeDto.getEmp_id(),
-//                newEmployeeDto.getJava_exp(),
-//                newEmployeeDto.getSpring_exp()
-//        );
-
-        EmployeeData newEmployeeData = this.daoMapper.employeeToEmployeeData(newEmployeeDto);
-        Skill newSkill = this.daoMapper.employeeToSkill(newEmployeeDto);
-
-        return Mono.zip(
-                employeeDataRepository.save(newEmployeeData),
-                skillRepository.save(newSkill),
-                (a,b)->{
-                    return new Employee(
-                            a.getEmp_id(),
-                            a.getEmp_name(),
-                            a.getEmp_city(),
-                            a.getEmp_phone(),
-                            b.getJava_exp(),
-                            b.getSpring_exp()
-                    );
-                }
-        );
+    public Mono<ResponseDto> createEmployee(RequestDto newRequestDtoDto) {
+        return employeeDataRepository.existsById(newRequestDtoDto.getEmp_id())
+                .flatMap(exists -> {
+                    String message = exists ? "Already" : "Created";
+                    return Mono
+                            .zip(
+                                    employeeDataRepository.save(this.daoMapper.employeeToEmployeeData(newRequestDtoDto)),
+                                    skillRepository.save(this.daoMapper.employeeToSkill(newRequestDtoDto)),
+                                    (a, b) -> {
+                                        return new RequestDto(
+                                                a.getEmp_id(),
+                                                a.getEmp_name(),
+                                                a.getEmp_city(),
+                                                a.getEmp_phone(),
+                                                b.getJava_exp(),
+                                                b.getSpring_exp()
+                                        );
+                                    }
+                            )
+                            .map(requestDto -> {
+                                        ResponseDto res = dtoMapper.requestToResponse(requestDto);
+                                        res.setStatus(message);
+                                        return res;
+                                    }
+                            );
+                });
     }
 }

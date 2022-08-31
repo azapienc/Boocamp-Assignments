@@ -1,6 +1,7 @@
 package com.bootcampzapien.assesment_1.controller;
 
-import com.bootcampzapien.assesment_1.dto.Employee;
+import com.bootcampzapien.assesment_1.dto.RequestDto;
+import com.bootcampzapien.assesment_1.dto.ResponseDto;
 import com.bootcampzapien.assesment_1.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +19,9 @@ public class EmployeeController {
     private EmployeeService employeeService;
 
     @PostMapping("createEmployee")
-    public Mono<Employee> createEmployee(@RequestBody Employee newEmployee) {
+    public Mono<ResponseDto> createEmployee(@RequestBody RequestDto newRequestDto) {
         log.info("Creating new employee");
-        return this.employeeService.createEmployee(newEmployee);
+        return this.employeeService.createEmployee(newRequestDto);
     }
 
 }
