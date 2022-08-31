@@ -1,6 +1,6 @@
 package com.bootcampzapien.assesment_1.service;
 
-import com.bootcampzapien.assesment_1.model.Skill;
+import com.bootcampzapien.assesment_1.entity.Skill;
 import com.bootcampzapien.assesment_1.repository.SkillRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

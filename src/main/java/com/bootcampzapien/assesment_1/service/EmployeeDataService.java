@@ -1,6 +1,6 @@
 package com.bootcampzapien.assesment_1.service;
 
-import com.bootcampzapien.assesment_1.model.EmployeeData;
+import com.bootcampzapien.assesment_1.entity.EmployeeData;
 import com.bootcampzapien.assesment_1.repository.EmployeeDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
