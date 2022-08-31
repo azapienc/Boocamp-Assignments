@@ -30,19 +30,15 @@ public class EmployeeService {
     public Mono<ResponseDto> createEmployee(RequestDto newRequestDtoDto) {
         return employeeDataRepository.existsById(newRequestDtoDto.getEmp_id())
                 .flatMap(exists -> {
-                    String message = exists ? "Already" : "Created";
+                    String message = exists ? "Already Exists" : "Created";
                     return Mono
                             .zip(
-                                    employeeDataRepository.save(this.daoMapper.employeeToEmployeeData(newRequestDtoDto)),
-                                    skillRepository.save(this.daoMapper.employeeToSkill(newRequestDtoDto)),
+                                    exists ? employeeDataRepository.findById(newRequestDtoDto.getEmp_id())
+                                            : employeeDataRepository.save(this.daoMapper.employeeToEmployeeData(newRequestDtoDto)),
+                                    exists ? skillRepository.findById(newRequestDtoDto.getEmp_id())
+                                            : skillRepository.save(this.daoMapper.employeeToSkill(newRequestDtoDto)),
                                     (a, b) -> {
-                                        return new RequestDto(
-                                                a.getEmp_id(),
-                                                a.getEmp_name(),
-                                                a.getEmp_city(),
-                                                a.getEmp_phone(),
-                                                b.getJava_exp(),
-                                                b.getSpring_exp()
+                                        return new RequestDto(a.getEmp_id(), a.getEmp_name(), a.getEmp_city(), a.getEmp_phone(), b.getJava_exp(), b.getSpring_exp()
                                         );
                                     }
                             )

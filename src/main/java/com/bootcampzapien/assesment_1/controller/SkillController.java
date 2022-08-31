@@ -18,6 +18,11 @@ public class SkillController {
         return skillService.getAllSkills();
     }
 
+    @GetMapping("findSkillById/{id}")
+    public Mono<Skill> findSkillById(@PathVariable int id){
+        return skillService.getSkillById(id);
+    }
+
     @DeleteMapping("deleteSkill")
     public Mono<Void> getAllEmployees(@RequestBody Skill skill){
         System.out.println(skill);
