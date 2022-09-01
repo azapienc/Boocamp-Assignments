@@ -2,6 +2,8 @@ package com.bootcampzapien.assesment_1.service;
 
 import com.bootcampzapien.assesment_1.dto.RequestDto;
 import com.bootcampzapien.assesment_1.dto.ResponseDto;
+import com.bootcampzapien.assesment_1.entity.EmployeeData;
+import com.bootcampzapien.assesment_1.entity.Skill;
 import com.bootcampzapien.assesment_1.mapper.DaoMapper;
 import com.bootcampzapien.assesment_1.mapper.DtoMapper;
 import com.bootcampzapien.assesment_1.publisher.SampleProducer;
@@ -10,7 +12,10 @@ import com.bootcampzapien.assesment_1.repository.SkillRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.function.BiFunction;
 
 @Service
 @Slf4j
@@ -41,25 +46,35 @@ public class EmployeeService {
                 })
                 .flatMap(exists -> {
                     String message = exists ? "Already Exists" : "Created";
-                    return Mono
-                            .zip(
+                    return Mono.zip(
                                     exists ? employeeDataRepository.findById(newRequestDtoDto.getEmp_id())
-                                            : employeeDataRepository.save(this.daoMapper.employeeToEmployeeData(newRequestDtoDto)),
+                                            : employeeDataRepository.save(this.daoMapper.requestToEmployeeData(newRequestDtoDto)),
                                     exists ? skillRepository.findById(newRequestDtoDto.getEmp_id())
-                                            : skillRepository.save(this.daoMapper.employeeToSkill(newRequestDtoDto)),
-                                    (a, b) -> {
-                                        return new RequestDto(a.getEmp_id(), a.getEmp_name(), a.getEmp_city(), a.getEmp_phone(), b.getJava_exp(), b.getSpring_exp()
-                                        );
-                                    }
-                            )
+                                            : skillRepository.save(this.daoMapper.requestToSkill(newRequestDtoDto)),
+                                    mergeEmployeeDataAndSkill())
                             .map(requestDto -> {
-                                        ResponseDto res = dtoMapper.requestToResponse(requestDto);
-                                        res.setStatus(message);
-                                        return res;
-                                    }
-                            );
+                                return dtoMapper.requestToResponse(requestDto, message);
+                            });
                 })
                 .map(this::publishToKafka);
+    }
+
+    public Flux<RequestDto> findEmpSkillset(RequestDto requestDto) {
+        return skillRepository.findByJavaExpGreaterThan(requestDto.getJava_exp())
+                .flatMap(skill -> {
+                    return employeeDataRepository.findById(skill.getEmpId()).flatMap(employeeData -> {
+                        return Mono.zip(
+                                Mono.just(employeeData),
+                                Mono.just(skill),
+                                mergeEmployeeDataAndSkill());
+                    });
+                });
+    }
+
+    private BiFunction<EmployeeData, Skill, RequestDto> mergeEmployeeDataAndSkill() {
+        return (a, b) -> {
+            return daoMapper.convert(a, b);
+        };
     }
 
     private ResponseDto publishToKafka(ResponseDto message) {

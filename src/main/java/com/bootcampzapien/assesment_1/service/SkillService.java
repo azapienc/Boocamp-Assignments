@@ -11,16 +11,8 @@ import reactor.core.publisher.Mono;
 public class SkillService {
     @Autowired
     private SkillRepository skillRepository;
-
-//    /**
-//     * Function to hardcode data in database
-//     */
-//    public void initializeEmployees(List<Employee> employees) {
-//        Flux<Employee> savedEmployees = skillRepository.saveAll(employees);
-//        savedEmployees.subscribe();
-//    }
-
     /**
+     *
      * Get list of all employees
      * @return employee flux
      */
@@ -35,6 +27,10 @@ public class SkillService {
      */
     public Mono<Skill> getSkillById(int id) {
         return skillRepository.findById(id);
+    }
+
+    public Flux<Skill> findGreaterThan(double id) {
+        return skillRepository.findByJavaExpGreaterThan(id);
     }
 
     /**

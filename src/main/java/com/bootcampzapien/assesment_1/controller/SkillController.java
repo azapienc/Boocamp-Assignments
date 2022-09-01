@@ -23,6 +23,11 @@ public class SkillController {
         return skillService.getSkillById(id);
     }
 
+    @GetMapping("findGreaterThan/{id}")
+    public Flux<Skill> findGreaterThan(@PathVariable double id){
+        return skillService.findGreaterThan(id);
+    }
+
     @DeleteMapping("deleteSkill")
     public Mono<Void> getAllEmployees(@RequestBody Skill skill){
         System.out.println(skill);

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
@@ -14,7 +15,10 @@ import org.springframework.data.cassandra.core.mapping.Table;
 @NoArgsConstructor
 public class Skill {
     @PrimaryKey
-    private int emp_id;
-    private Double java_exp;
-    private Double spring_exp;
+    @Column(value = "emp_id")
+    private int empId;
+    @Column(value = "java_exp")
+    private Double javaExp;
+    @Column(value = "spring_exp")
+    private Double springExp;
 }

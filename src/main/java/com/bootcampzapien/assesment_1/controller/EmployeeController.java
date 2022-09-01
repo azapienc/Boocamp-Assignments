@@ -5,10 +5,8 @@ import com.bootcampzapien.assesment_1.dto.ResponseDto;
 import com.bootcampzapien.assesment_1.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -19,8 +17,13 @@ public class EmployeeController {
     private EmployeeService employeeService;
 
     @PostMapping("createEmployee")
-    public Mono<ResponseDto> createEmployee(@RequestBody RequestDto newRequestDto) {
-        return this.employeeService.createEmployee(newRequestDto);
+    public Mono<ResponseDto> createEmployee(@RequestBody RequestDto requestDto) {
+        return this.employeeService.createEmployee(requestDto);
+    }
+
+    @GetMapping("findEmpSkillset")
+    public Flux<RequestDto> findEmpSkillset(@RequestBody RequestDto requestDto){
+        return this.employeeService.findEmpSkillset(requestDto);
     }
 
 }
