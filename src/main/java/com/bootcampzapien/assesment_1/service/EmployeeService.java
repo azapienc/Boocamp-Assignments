@@ -7,23 +7,9 @@ import com.bootcampzapien.assesment_1.mapper.DtoMapper;
 import com.bootcampzapien.assesment_1.publisher.SampleProducer;
 import com.bootcampzapien.assesment_1.repository.EmployeeDataRepository;
 import com.bootcampzapien.assesment_1.repository.SkillRepository;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.clients.producer.ProducerRecord;
-
-import java.time.format.DateTimeFormatter;
-import java.util.Map;
-import java.util.Properties;
-
-import reactor.kafka.sender.KafkaSender;
-
-import java.util.Properties;
-import java.util.concurrent.CountDownLatch;
 
 @Service
 public class EmployeeService {
@@ -37,18 +23,7 @@ public class EmployeeService {
     private DtoMapper dtoMapper;
 
     //Setup Properties for Kafka Producer
-    final String BOOTSTRAP_SERVERS = "localhost:9092";
-    final String TOPIC = "app_updates";
-
-    KafkaSender<Integer, String> sender;
-    DateTimeFormatter dateFormat;
-
-    int count = 20;
-    CountDownLatch latch = new CountDownLatch(count);
-
-    SampleProducer producer = new SampleProducer(BOOTSTRAP_SERVERS);
-
-
+    SampleProducer producer = new SampleProducer(SampleProducer.BOOTSTRAP_SERVERS);
 
     /**
      * creates a new employee
@@ -78,14 +53,17 @@ public class EmployeeService {
                                     }
                             );
                 })
-                .map(message -> {
-                    try {
-                        producer.sendMessages(TOPIC,count,latch);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    return message;
-                });
+                .map(this::publishToKafka);
     }
 
+    private ResponseDto publishToKafka(ResponseDto message) {
+        if (message.getStatus().equals("Created")) {
+            try {
+                producer.sendMessage(SampleProducer.TOPIC, dtoMapper.responseToRequest(message));
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return message;
+    }
 }
