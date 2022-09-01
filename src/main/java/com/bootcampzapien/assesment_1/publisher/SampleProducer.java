@@ -8,6 +8,7 @@ import org.apache.kafka.common.serialization.IntegerSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
 import reactor.core.publisher.Mono;
 import reactor.kafka.sender.KafkaSender;
 import reactor.kafka.sender.SenderOptions;
@@ -36,14 +37,15 @@ public class SampleProducer {
     }
 
     public void sendMessage(String topic, RequestDto requestDto) throws InterruptedException {
-        sender.send(Mono.just(requestDto).map(i -> SenderRecord.create(
-                        new ProducerRecord<>(topic, requestDto.getEmp_id(), requestDto.toString()), i))
+        sender.send(Mono.just(requestDto).map(i ->
+                        SenderRecord.create(new ProducerRecord<>(
+                                topic,
+                                requestDto.getEmp_id(),
+                                requestDto.toString()), i))
                 )
                 .doOnError(e -> log.error("Send failed", e))
-                .subscribe(r -> {
-                    log.info("Message sent succesfully");
-                })
-        ;
+                .doOnNext(r -> log.info("Message # " + r.correlationMetadata() + " send response: " + r.recordMetadata()))
+                .subscribe();
     }
 
     public void close() {

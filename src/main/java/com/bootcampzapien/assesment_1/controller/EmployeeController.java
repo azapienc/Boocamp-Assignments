@@ -20,7 +20,6 @@ public class EmployeeController {
 
     @PostMapping("createEmployee")
     public Mono<ResponseDto> createEmployee(@RequestBody RequestDto newRequestDto) {
-        log.info("Creating new employee");
         return this.employeeService.createEmployee(newRequestDto);
     }
 

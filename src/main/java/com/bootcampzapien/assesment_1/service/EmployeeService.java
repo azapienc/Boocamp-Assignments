@@ -7,11 +7,13 @@ import com.bootcampzapien.assesment_1.mapper.DtoMapper;
 import com.bootcampzapien.assesment_1.publisher.SampleProducer;
 import com.bootcampzapien.assesment_1.repository.EmployeeDataRepository;
 import com.bootcampzapien.assesment_1.repository.SkillRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
+@Slf4j
 public class EmployeeService {
     @Autowired
     private EmployeeDataRepository employeeDataRepository;
@@ -32,7 +34,11 @@ public class EmployeeService {
      * @return Employee mono
      */
     public Mono<ResponseDto> createEmployee(RequestDto newRequestDtoDto) {
+        log.info("Creating new employee");
         return employeeDataRepository.existsById(newRequestDtoDto.getEmp_id())
+                .flatMap(exists -> {
+                    return exists ? skillRepository.existsById(newRequestDtoDto.getEmp_id()) : Mono.just(false);
+                })
                 .flatMap(exists -> {
                     String message = exists ? "Already Exists" : "Created";
                     return Mono
@@ -66,4 +72,7 @@ public class EmployeeService {
         }
         return message;
     }
+
 }
+
+
