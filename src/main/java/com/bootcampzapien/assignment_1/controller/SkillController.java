@@ -1,7 +1,7 @@
-package com.bootcampzapien.assesment_1.controller;
+package com.bootcampzapien.assignment_1.controller;
 
-import com.bootcampzapien.assesment_1.entity.Skill;
-import com.bootcampzapien.assesment_1.service.SkillService;
+import com.bootcampzapien.assignment_1.entity.Skill;
+import com.bootcampzapien.assignment_1.service.SkillService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;

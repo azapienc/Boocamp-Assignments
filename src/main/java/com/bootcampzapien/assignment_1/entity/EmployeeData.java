@@ -1,4 +1,4 @@
-package com.bootcampzapien.assesment_1.entity;
+package com.bootcampzapien.assignment_1.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,17 +8,19 @@ import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
-@Table("emp_skill")
+@Table("emp")
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Skill {
+public class EmployeeData {
     @PrimaryKey
     @Column(value = "emp_id")
     private int empId;
-    @Column(value = "java_exp")
-    private Double javaExp;
-    @Column(value = "spring_exp")
-    private Double springExp;
+    @Column(value = "emp_name")
+    private String empName;
+    @Column(value = "emp_city")
+    private String empCity;
+    @Column(value = "emp_phone")
+    private String empPhone;
 }

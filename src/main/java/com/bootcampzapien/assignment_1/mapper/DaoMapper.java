@@ -1,8 +1,8 @@
-package com.bootcampzapien.assesment_1.mapper;
+package com.bootcampzapien.assignment_1.mapper;
 
-import com.bootcampzapien.assesment_1.dto.RequestDto;
-import com.bootcampzapien.assesment_1.entity.EmployeeData;
-import com.bootcampzapien.assesment_1.entity.Skill;
+import com.bootcampzapien.assignment_1.dto.RequestDto;
+import com.bootcampzapien.assignment_1.entity.EmployeeData;
+import com.bootcampzapien.assignment_1.entity.Skill;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

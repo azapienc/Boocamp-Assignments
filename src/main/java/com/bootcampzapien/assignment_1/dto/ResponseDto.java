@@ -1,4 +1,4 @@
-package com.bootcampzapien.assesment_1.dto;
+package com.bootcampzapien.assignment_1.dto;
 
 import lombok.Builder;
 import lombok.Data;

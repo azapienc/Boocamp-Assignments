@@ -1,7 +1,7 @@
-package com.bootcampzapien.assesment_1.mapper;
+package com.bootcampzapien.assignment_1.mapper;
 
-import com.bootcampzapien.assesment_1.dto.RequestDto;
-import com.bootcampzapien.assesment_1.dto.ResponseDto;
+import com.bootcampzapien.assignment_1.dto.RequestDto;
+import com.bootcampzapien.assignment_1.dto.ResponseDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -15,5 +15,7 @@ public interface DtoMapper {
 
     @Mapping(source = "status",target = "status")
     ResponseDto requestToResponse(RequestDto requestDto, String status);
+
+    RequestDto clean(RequestDto requestDto);
 
 }

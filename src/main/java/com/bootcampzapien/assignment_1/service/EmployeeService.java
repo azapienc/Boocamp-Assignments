@@ -1,14 +1,15 @@
-package com.bootcampzapien.assesment_1.service;
+package com.bootcampzapien.assignment_1.service;
 
-import com.bootcampzapien.assesment_1.dto.RequestDto;
-import com.bootcampzapien.assesment_1.dto.ResponseDto;
-import com.bootcampzapien.assesment_1.entity.EmployeeData;
-import com.bootcampzapien.assesment_1.entity.Skill;
-import com.bootcampzapien.assesment_1.mapper.DaoMapper;
-import com.bootcampzapien.assesment_1.mapper.DtoMapper;
-import com.bootcampzapien.assesment_1.publisher.SampleProducer;
-import com.bootcampzapien.assesment_1.repository.EmployeeDataRepository;
-import com.bootcampzapien.assesment_1.repository.SkillRepository;
+import com.bootcampzapien.assignment_1.dto.RequestDto;
+import com.bootcampzapien.assignment_1.dto.ResponseDto;
+import com.bootcampzapien.assignment_1.entity.EmployeeData;
+import com.bootcampzapien.assignment_1.entity.Skill;
+import com.bootcampzapien.assignment_1.exception.BootcampExperienceException;
+import com.bootcampzapien.assignment_1.mapper.DaoMapper;
+import com.bootcampzapien.assignment_1.mapper.DtoMapper;
+import com.bootcampzapien.assignment_1.publisher.SampleProducer;
+import com.bootcampzapien.assignment_1.repository.EmployeeDataRepository;
+import com.bootcampzapien.assignment_1.repository.SkillRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,9 +29,8 @@ public class EmployeeService {
     private DaoMapper daoMapper;
     @Autowired
     private DtoMapper dtoMapper;
-
-    //Setup Properties for Kafka Producer
-    SampleProducer producer = new SampleProducer(SampleProducer.BOOTSTRAP_SERVERS);
+    @Autowired
+    private SampleProducer producer;
 
     /**
      * creates a new employee
@@ -59,8 +59,14 @@ public class EmployeeService {
                 .map(this::publishToKafka);
     }
 
-    public Flux<RequestDto> findEmpSkillset(RequestDto requestDto) {
-        return skillRepository.findByJavaExpGreaterThan(requestDto.getJava_exp())
+    public Flux<RequestDto> findEmpSkillset(RequestDto requestDto) throws BootcampExperienceException {
+        //TODO:
+        if(requestDto.getJava_exp()<0){
+            throw new BootcampExperienceException("Negative java experience");
+        }
+
+        return skillRepository.findAll()
+                .filter(skill -> skill.getJavaExp() >= requestDto.getJava_exp())
                 .flatMap(skill -> {
                     return employeeDataRepository.findById(skill.getEmpId()).flatMap(employeeData -> {
                         return Mono.zip(
@@ -89,5 +95,3 @@ public class EmployeeService {
     }
 
 }
-
-

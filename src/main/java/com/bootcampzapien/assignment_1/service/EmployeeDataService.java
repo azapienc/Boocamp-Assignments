@@ -1,7 +1,7 @@
-package com.bootcampzapien.assesment_1.service;
+package com.bootcampzapien.assignment_1.service;
 
-import com.bootcampzapien.assesment_1.entity.EmployeeData;
-import com.bootcampzapien.assesment_1.repository.EmployeeDataRepository;
+import com.bootcampzapien.assignment_1.entity.EmployeeData;
+import com.bootcampzapien.assignment_1.repository.EmployeeDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
