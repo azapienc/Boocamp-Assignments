@@ -38,14 +38,17 @@ public class SampleProducer {
         sender = KafkaSender.create(senderOptions);
     }
 
-    public void sendMessage(String topic, String requestDto) throws InterruptedException {
+    public void sendMessage(String topic, String requestDto) {
         sender.send(Mono.just(requestDto).map(i ->
                         SenderRecord.create(new ProducerRecord<>(
                                 topic,
                                 1,
                                 requestDto), i))
                 )
-                .doOnError(e -> log.error("Send failed", e))
+                .doOnError(e -> {
+                    log.error("Send failed", e);
+                    throw new RuntimeException(e);
+                })
                 .doOnNext(r -> log.info("Message # " + r.correlationMetadata() + " send response: " + r.recordMetadata()))
                 .subscribe();
     }

@@ -13,8 +13,6 @@ public class ListenerConfiguration {
         return new SampleListener();
     }
 
-
-
 //    @Bean
 //    SampleProducer producer(){
 //        return new SampleProducer();

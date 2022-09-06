@@ -14,6 +14,7 @@ import reactor.kafka.receiver.KafkaReceiver;
 import reactor.kafka.receiver.ReceiverOptions;
 import reactor.kafka.receiver.ReceiverRecord;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,17 +22,15 @@ import java.util.Map;
 @Slf4j
 public class SampleListener {
     @Autowired
-    SampleProducer producer;
+    private SampleProducer producer;
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
-    private static final String BOOTSTRAP_SERVERS = "localhost:9092";
-    private static final String TOPIC = "app_updates";
     private final KafkaReceiver<Integer, String> receiver;
-    private StringDeserializer deserializer = new StringDeserializer();
-
-    private static final String EM_DQL = "em_DQL";
+    private static final String BOOTSTRAP_SERVERS = "localhost:9092";
     private static final String EMP_UPDATES = "emp_updates";
+    private static final String EM_DQL = "em_DQL";
+    private static final String TOPIC = "app_updates";
 
     public SampleListener() {
         Map<String, Object> consumerProps = new HashMap<>();
@@ -48,13 +47,13 @@ public class SampleListener {
     }
 
     public void receiveMessage() {
-        Flux<ReceiverRecord<Integer, String>> inboundFlux = receiver.receive();
-        inboundFlux
-                .subscribe(this::evaluateAndPublishMessage);
+        receiver.receive().subscribe(this::evaluateAndPublishMessage);
     }
 
     private void evaluateAndPublishMessage(ReceiverRecord<Integer, String> r) {
         log.info("Received message: " + r.toString());
+        r.receiverOffset().acknowledge();
+
         if (isMessagevalid(r)) {
             log.info("Publishing to emp_updates");
             publishMessage(EMP_UPDATES, r);
@@ -62,25 +61,26 @@ public class SampleListener {
             log.warn("Publishing to em_dql");
             publishMessage(EM_DQL, r);
         }
-        r.receiverOffset().acknowledge();
     }
 
     private boolean isMessagevalid(ReceiverRecord<Integer, String> r) {
         RequestDto formattedMessage = new RequestDto();
         try {
             formattedMessage = objectMapper.readValue(r.value(), RequestDto.class);
-            System.out.println(formattedMessage);
+            if (formattedMessage.getEmp_id() <= 0 ||
+                    formattedMessage.getEmp_name() == null || formattedMessage.getEmp_name().equals("") ||
+                    formattedMessage.getEmp_city() == null || formattedMessage.getEmp_city().equals("") ||
+                    formattedMessage.getEmp_phone() == null || formattedMessage.getEmp_phone().equals("") ||
+                    formattedMessage.getJava_exp() == null ||
+                    formattedMessage.getSpring_exp() == null)
+                return false;
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            return false;
         }
         return true;
     }
 
     private void publishMessage(String topic, ReceiverRecord<Integer, String> message) {
-        try {
-            producer.sendMessage(topic, message.value());
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        producer.sendMessage(topic, message.value());
     }
 }
