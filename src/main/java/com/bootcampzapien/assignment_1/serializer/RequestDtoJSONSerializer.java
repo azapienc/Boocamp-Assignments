@@ -1,4 +1,4 @@
-package com.bootcampzapien.assignment_1.mapper;
+package com.bootcampzapien.assignment_1.serializer;
 
 import com.bootcampzapien.assignment_1.dto.RequestDto;
 import com.fasterxml.jackson.core.JsonGenerator;

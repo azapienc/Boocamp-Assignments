@@ -8,16 +8,16 @@ import javax.validation.constraints.NotNull;
 @Data
 @Builder
 public class RequestDto {
-    @NotNull
+    @NotNull(message = "{Request.ID.INVALID}")
     private int emp_id;
-    @NotNull
+    @NotNull(message = "{Request.NAME.INVALID}")
     private String emp_name;
-    @NotNull
+    @NotNull(message = "{Request.CITY.INVALID}")
     private String emp_city;
     @NotNull(message = "{Request.PHONE.INVALID}")
     private String emp_phone;
-    @NotNull
+    @NotNull(message = "{Request.JAVAEXP.INVALID}")
     private Double java_exp;
-    @NotNull
+    @NotNull(message = "{Request.SPRINGEXP.INVALID}")
     private Double spring_exp;
 }

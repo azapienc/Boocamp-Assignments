@@ -17,11 +17,4 @@ public interface SkillRepository extends ReactiveCassandraRepository<Skill, Inte
     @AllowFiltering
     Flux<Skill> findBySpringExpGreaterThan(double springExp);
 
-    @AllowFiltering
-    Flux<Skill> findByJavaExpAndSpringExpGreaterThan(double javaExp, double springExp);
-
-    @Query("select p from part where p.property = :javaExp ")
-    @AllowFiltering
-    Flux<Skill> method(@Param("javaExp") double javaExp, double springExp);
-
 }

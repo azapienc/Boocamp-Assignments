@@ -22,7 +22,7 @@ public class errorHandler {
 
     @ExceptionHandler(BootcampExperienceException.class)
     public ResponseEntity<ErrorInfo> experienceExceptionHandler(BootcampExperienceException ex) {
-        ErrorInfo error = new ErrorInfo("Negative experience is not allowed", 96);
+        ErrorInfo error = new ErrorInfo(ex.getMessage(), 001);
         return ResponseEntity.badRequest().body(error);
     }
 

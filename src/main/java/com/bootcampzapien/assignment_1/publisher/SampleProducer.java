@@ -1,7 +1,6 @@
 package com.bootcampzapien.assignment_1.publisher;
 
 import com.bootcampzapien.assignment_1.dto.RequestDto;
-import com.bootcampzapien.assignment_1.mapper.RequestDtoJSONSerializer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
@@ -12,7 +11,6 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import reactor.kafka.sender.KafkaSender;
@@ -25,13 +23,12 @@ import java.util.Map;
 @Getter
 @Component
 public class SampleProducer {
-    public static final String BOOTSTRAP_SERVERS = "localhost:9092";
-    public static final String TOPIC = "app_updates";
-    private static final Logger log = LoggerFactory.getLogger(SampleProducer.class.getName());
-    private final KafkaSender<Integer, String> sender;
-
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
+    private final KafkaSender<Integer, String> sender;
+    private static final Logger log = LoggerFactory.getLogger(SampleProducer.class.getName());
+    private static final String BOOTSTRAP_SERVERS = "localhost:9092";
+    public static final String TOPIC = "app_updates";
 
     public SampleProducer() {
         Map<String, Object> props = new HashMap<>();
@@ -45,22 +42,31 @@ public class SampleProducer {
         sender = KafkaSender.create(senderOptions);
     }
 
-    public void sendMessage(String topic, RequestDto requestDto) throws InterruptedException {
-        sender.send(Mono.just(requestDto).map(i ->
-                        {
-                            try {
-                                return SenderRecord.create(new ProducerRecord<>(
-                                        topic,
-                                        requestDto.getEmp_id(),
-                                        objectMapper.writeValueAsString(requestDto)), i);
-                            } catch (JsonProcessingException e) {
-                                throw new RuntimeException(e);
-                            }
-                        })
-                )
-                .doOnError(e -> log.error("Send failed", e))
+    public void sendMessage(String topic, RequestDto requestDto) {
+        sender.send(Mono.just(requestDto)
+                        .map(i -> SenderRecord.create(new ProducerRecord<>(
+                                topic,
+                                requestDto.getEmp_id(),
+                                handleSerialization(requestDto)), i)))
+                .doOnError(e -> {
+                    log.error("Send failed", e);
+                    throw new RuntimeException(e);
+                })
                 .doOnNext(r -> log.info("Message # " + r.correlationMetadata() + " send response: " + r.recordMetadata()))
                 .subscribe();
+    }
+
+    /**
+     * Serializes input object to JSON object
+     * @param requestDto
+     * @return
+     */
+    private String handleSerialization(RequestDto requestDto) {
+        try {
+            return objectMapper.writeValueAsString(requestDto);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void close() {
