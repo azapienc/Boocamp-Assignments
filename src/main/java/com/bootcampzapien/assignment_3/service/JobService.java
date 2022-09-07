@@ -2,19 +2,16 @@ package com.bootcampzapien.assignment_3.service;
 
 import com.bootcampzapien.assignment_3.dto.RequestDto;
 import com.bootcampzapien.assignment_3.dto.ResponseDto;
-import com.bootcampzapien.assignment_3.dto.UserDto;
-import com.bootcampzapien.assignment_3.entity.JobData;
+import com.bootcampzapien.assignment_3.dto.EmployeeDto;
 import com.bootcampzapien.assignment_3.mapper.DaoMapper;
 import com.bootcampzapien.assignment_3.mapper.DtoMapper;
 import com.bootcampzapien.assignment_3.repository.JobRepository;
 import com.bootcampzapien.assignment_3.utils.Status;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -41,14 +38,13 @@ public class JobService {
         return hazelcastInstance.getMap("map");
     }
 
-
     WebClient client = WebClient.create("http://localhost:8080");
 
     /**
-     * creates a new employee
+     * creates a new Job profile
      *
      * @param newRequestDtoDto
-     * @return Employee Mono
+     * @return Created job profile
      */
     public Mono<ResponseDto> createJobProfile(RequestDto newRequestDtoDto) {
         log.info("Creating new job profile");
@@ -61,7 +57,13 @@ public class JobService {
                 });
     }
 
-    public Flux<UserDto> findEmpForJobID(RequestDto requestDto) {
+    /**
+     * Find employees through webclient that meets the required experience
+     *
+     * @param requestDto
+     * @return Founded employees
+     */
+    public Flux<EmployeeDto> findEmpForJobID(RequestDto requestDto) {
         return client.method(HttpMethod.GET)
                 .uri("/findEmpSkillset")
                 .body(jobRepository
@@ -69,29 +71,37 @@ public class JobService {
                                 .map(response -> daoMapper.jobToRequest(response))
                         , RequestDto.class)
                 .retrieve()
-                .bodyToFlux(UserDto.class);
+                .bodyToFlux(EmployeeDto.class);
     }
 
-    //    @Cacheable("cache")
+    /**
+     * Get Job profiles from cache, if the profile does not exist then save it.
+     *
+     * @param requestDto
+     * @return Founded Job profile from cache or database
+     * @throws JsonProcessingException
+     */
     public Mono<RequestDto> getJobProfileFromCache(RequestDto requestDto) throws JsonProcessingException {
         if (retrieveMap().containsKey(String.valueOf(requestDto.getJob_id()))) {
-            log.info("Reading request from cache" + retrieveMap().get(String.valueOf(requestDto.getJob_id())));
-            return Mono.just(objectMapper.readValue(
-                    retrieveMap().get(String.valueOf(requestDto.getJob_id()))
-                    , RequestDto.class));
+            log.info("Reading request from cache");
+            return Mono.just(objectMapper.readValue(retrieveMap().get(String.valueOf(requestDto.getJob_id())), RequestDto.class));
         } else {
             log.info("Reading request from database and updating cache");
-
             return jobRepository
-                    .findById(requestDto.getJob_id())
-                    .map(jobData -> daoMapper.jobToRequest(jobData))
-                    .map(requestDto1 -> {
-                        try {
-                            retrieveMap().put(String.valueOf(requestDto.getJob_id()), objectMapper.writeValueAsString(requestDto1));
-                        } catch (JsonProcessingException e) {
-                            throw new RuntimeException(e);
-                        }
-                        return  requestDto1;
+                    .existsById(requestDto.getJob_id())
+                    .flatMap(exists -> {
+                        return jobRepository
+                                .findById(requestDto.getJob_id())
+                                .map(jobData -> daoMapper.jobToRequest(jobData))
+                                .map(requestDto1 -> {
+                                    try {
+                                        if (exists)
+                                            retrieveMap().put(String.valueOf(requestDto.getJob_id()), objectMapper.writeValueAsString(requestDto1));
+                                    } catch (JsonProcessingException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                    return requestDto1;
+                                });
                     });
         }
     }

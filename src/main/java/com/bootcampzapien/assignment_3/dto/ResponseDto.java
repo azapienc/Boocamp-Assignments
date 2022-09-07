@@ -9,9 +9,7 @@ import java.io.Serializable;
 
 @Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class ResponseDto implements Serializable {
+public class ResponseDto {
     private int job_id;
     private String job_name;
     private Double java_exp;
