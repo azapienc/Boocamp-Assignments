@@ -75,16 +75,24 @@ public class JobService {
     //    @Cacheable("cache")
     public Mono<RequestDto> getJobProfileFromCache(RequestDto requestDto) throws JsonProcessingException {
         if (retrieveMap().containsKey(String.valueOf(requestDto.getJob_id()))) {
-            log.info("Reading request from cache");
+            log.info("Reading request from cache" + retrieveMap().get(String.valueOf(requestDto.getJob_id())));
             return Mono.just(objectMapper.readValue(
                     retrieveMap().get(String.valueOf(requestDto.getJob_id()))
                     , RequestDto.class));
         } else {
             log.info("Reading request from database and updating cache");
-            retrieveMap().put(String.valueOf(requestDto.getJob_id()), objectMapper.writeValueAsString(requestDto));
+
             return jobRepository
                     .findById(requestDto.getJob_id())
-                    .map(jobData -> daoMapper.jobToRequest(jobData));
+                    .map(jobData -> daoMapper.jobToRequest(jobData))
+                    .map(requestDto1 -> {
+                        try {
+                            retrieveMap().put(String.valueOf(requestDto.getJob_id()), objectMapper.writeValueAsString(requestDto1));
+                        } catch (JsonProcessingException e) {
+                            throw new RuntimeException(e);
+                        }
+                        return  requestDto1;
+                    });
         }
     }
 }
