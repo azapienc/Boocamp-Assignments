@@ -46,27 +46,39 @@ public class SampleListener {
         receiver = KafkaReceiver.create(receiverOptions);
     }
 
+    /**
+     * Listens the updates topic
+     */
     public void receiveMessage() {
         receiver.receive().subscribe(this::evaluateAndPublishMessage);
     }
 
-    private void evaluateAndPublishMessage(ReceiverRecord<Integer, String> r) {
-        log.info("Received message: " + r.toString());
-        r.receiverOffset().acknowledge();
+    /**
+     * Evaluates if the message is correct and publish it to the corresponding topic
+     * @param receivedMessage
+     */
+    private void evaluateAndPublishMessage(ReceiverRecord<Integer, String> receivedMessage) {
+        log.info("Received message: " + receivedMessage.toString());
+        receivedMessage.receiverOffset().acknowledge();
 
-        if (isMessagevalid(r)) {
+        if (isMessagevalid(receivedMessage)) {
             log.info("Publishing to emp_updates");
-            publishMessage(EMP_UPDATES, r);
+            publishMessage(EMP_UPDATES, receivedMessage);
         } else {
             log.warn("Publishing to em_dql");
-            publishMessage(EM_DQL, r);
+            publishMessage(EM_DQL, receivedMessage);
         }
     }
 
-    private boolean isMessagevalid(ReceiverRecord<Integer, String> r) {
+    /**
+     * Deserializes and validates the message
+     * @param receivedMessaged
+     * @return
+     */
+    private boolean isMessagevalid(ReceiverRecord<Integer, String> receivedMessaged) {
         RequestDto formattedMessage = new RequestDto();
         try {
-            formattedMessage = objectMapper.readValue(r.value(), RequestDto.class);
+            formattedMessage = objectMapper.readValue(receivedMessaged.value(), RequestDto.class);
             if (formattedMessage.getEmp_id() <= 0 ||
                     formattedMessage.getEmp_name() == null || formattedMessage.getEmp_name().equals("") ||
                     formattedMessage.getEmp_city() == null || formattedMessage.getEmp_city().equals("") ||
@@ -80,6 +92,11 @@ public class SampleListener {
         return true;
     }
 
+    /**
+     * Publish the message to Kafka once it is validated
+     * @param topic
+     * @param message
+     */
     private void publishMessage(String topic, ReceiverRecord<Integer, String> message) {
         producer.sendMessage(topic, message.value());
     }

@@ -38,6 +38,11 @@ public class SampleProducer {
         sender = KafkaSender.create(senderOptions);
     }
 
+    /**
+     * Publish the message to Kafka topic
+     * @param topic
+     * @param requestDto
+     */
     public void sendMessage(String topic, String requestDto) {
         sender.send(Mono.just(requestDto).map(i ->
                         SenderRecord.create(new ProducerRecord<>(
