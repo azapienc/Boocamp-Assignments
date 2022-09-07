@@ -8,12 +8,14 @@ import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
+import java.io.Serializable;
+
 @Table("job")
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class JobData {
+public class JobData{
     @PrimaryKey
     @Column(value = "job_id")
     private int jobId;

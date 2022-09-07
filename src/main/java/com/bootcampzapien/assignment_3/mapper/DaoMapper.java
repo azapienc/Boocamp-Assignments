@@ -6,6 +6,7 @@ import com.bootcampzapien.assignment_3.entity.JobData;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+import reactor.core.publisher.Mono;
 
 @Mapper(componentModel = "spring")
 public interface DaoMapper {
@@ -29,5 +30,6 @@ public interface DaoMapper {
     @Mapping(source = "jobData.jobName", target = "job_name")
     @Mapping(source = "jobData.javaExp", target = "java_exp")
     @Mapping(source = "jobData.springExp", target = "spring_exp")
-    ResponseDto jobToRequest(JobData jobData);
+    RequestDto jobToRequest(JobData jobData);
+
 }
