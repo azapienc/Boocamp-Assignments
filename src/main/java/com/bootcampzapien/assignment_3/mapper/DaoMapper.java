@@ -23,5 +23,11 @@ public interface DaoMapper {
     @Mapping(source = "jobData.javaExp", target = "java_exp")
     @Mapping(source = "jobData.springExp", target = "spring_exp")
     @Mapping(source = "status",target = "status")
-    ResponseDto JobToResponse(JobData jobData, String status);
+    ResponseDto jobToResponse(JobData jobData, String status);
+
+    @Mapping(source = "jobData.jobId", target = "job_id")
+    @Mapping(source = "jobData.jobName", target = "job_name")
+    @Mapping(source = "jobData.javaExp", target = "java_exp")
+    @Mapping(source = "jobData.springExp", target = "spring_exp")
+    ResponseDto jobToRequest(JobData jobData);
 }
