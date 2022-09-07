@@ -18,12 +18,25 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
 
+    /**
+     * Creates a new employee
+     *
+     * @param requestDto
+     * @return Created employee
+     */
     @PostMapping("createEmployee")
     @Validated
     public Mono<ResponseDto> createEmployee(@Valid @RequestBody RequestDto requestDto) {
         return this.employeeService.createEmployee(requestDto);
     }
 
+    /**
+     * Look for users with matching skills
+     *
+     * @param requestDto
+     * @return Employee that meets the input experience
+     * @throws BootcampExperienceException
+     */
     @GetMapping("findEmpSkillset")
     public Flux<RequestDto> findEmpSkillset(@RequestBody RequestDto requestDto) throws BootcampExperienceException {
         return this.employeeService.findEmpSkillset(requestDto);

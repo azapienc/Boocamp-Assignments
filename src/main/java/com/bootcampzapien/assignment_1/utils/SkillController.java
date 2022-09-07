@@ -1,4 +1,4 @@
-package com.bootcampzapien.assignment_1.controller;
+package com.bootcampzapien.assignment_1.utils;
 
 import com.bootcampzapien.assignment_1.entity.Skill;
 import com.bootcampzapien.assignment_1.service.SkillService;

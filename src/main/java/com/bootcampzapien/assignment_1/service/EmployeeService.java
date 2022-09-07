@@ -34,10 +34,10 @@ public class EmployeeService {
     private SampleProducer producer;
 
     /**
-     * creates a new employee
+     * Creates a new employee
      *
      * @param newRequestDtoDto
-     * @return Employee Mono
+     * @return Created employee
      */
     public Mono<ResponseDto> createEmployee(RequestDto newRequestDtoDto) {
         log.info("Creating new employee");
@@ -60,7 +60,7 @@ public class EmployeeService {
      * Look for users with matching skills
      *
      * @param requestDto
-     * @return Employee Flux
+     * @return Employee that meets the input experience
      * @throws BootcampExperienceException
      */
     public Flux<RequestDto> findEmpSkillset(RequestDto requestDto) throws BootcampExperienceException {
@@ -85,9 +85,8 @@ public class EmployeeService {
     private Flux<Skill> getSkillSet(RequestDto requestDto) throws BootcampExperienceException {
         if (requestDto.getJava_exp() == null && requestDto.getSpring_exp() == null)
             throw new BootcampExperienceException("No parameter to evaluate");
-        else if (requestDto.getJava_exp() != null && requestDto.getSpring_exp() != null) {
+        else if (requestDto.getJava_exp() != null && requestDto.getSpring_exp() != null)
             return skillRepository.findByJavaExpGreaterThanEqualAndSpringExpGreaterThanEqual(requestDto.getJava_exp(), requestDto.getSpring_exp());
-        }
         else if (requestDto.getJava_exp() != null)
             return skillRepository.findByJavaExpGreaterThanEqual(requestDto.getJava_exp());
         else if (requestDto.getSpring_exp() != null)
@@ -96,7 +95,7 @@ public class EmployeeService {
     }
 
     /**
-     * Merge employee with its skills
+     * Merge employee data with its skills
      *
      * @return DTO with composed properties
      */

@@ -42,6 +42,11 @@ public class SampleProducer {
         sender = KafkaSender.create(senderOptions);
     }
 
+    /**
+     * Sends message to Kafka topic
+     * @param topic
+     * @param requestDto
+     */
     public void sendMessage(String topic, RequestDto requestDto) {
         sender.send(Mono.just(requestDto)
                         .map(i -> SenderRecord.create(new ProducerRecord<>(
@@ -59,7 +64,7 @@ public class SampleProducer {
     /**
      * Serializes input object to JSON object
      * @param requestDto
-     * @return
+     * @return Serialized object
      */
     private String handleSerialization(RequestDto requestDto) {
         try {
