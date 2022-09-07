@@ -30,7 +30,7 @@ public class SkillService {
     }
 
     public Flux<Skill> findGreaterThan(double id) {
-        return skillRepository.findByJavaExpGreaterThan(id);
+        return skillRepository.findByJavaExpGreaterThanEqual(id);
     }
 
     /**

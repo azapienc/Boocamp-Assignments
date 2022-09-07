@@ -85,12 +85,13 @@ public class EmployeeService {
     private Flux<Skill> getSkillSet(RequestDto requestDto) throws BootcampExperienceException {
         if (requestDto.getJava_exp() == null && requestDto.getSpring_exp() == null)
             throw new BootcampExperienceException("No parameter to evaluate");
-        else if (requestDto.getJava_exp() != null && requestDto.getSpring_exp() != null)
-            throw new BootcampExperienceException("Only one parameter is allowed");
+        else if (requestDto.getJava_exp() != null && requestDto.getSpring_exp() != null) {
+            return skillRepository.findByJavaExpGreaterThanEqualAndSpringExpGreaterThanEqual(requestDto.getJava_exp(), requestDto.getSpring_exp());
+        }
         else if (requestDto.getJava_exp() != null)
-            return skillRepository.findByJavaExpGreaterThan(requestDto.getJava_exp());
+            return skillRepository.findByJavaExpGreaterThanEqual(requestDto.getJava_exp());
         else if (requestDto.getSpring_exp() != null)
-            return skillRepository.findBySpringExpGreaterThan(requestDto.getSpring_exp());
+            return skillRepository.findBySpringExpGreaterThanEqual(requestDto.getSpring_exp());
         throw new BootcampExperienceException("Invalid parameters");
     }
 
