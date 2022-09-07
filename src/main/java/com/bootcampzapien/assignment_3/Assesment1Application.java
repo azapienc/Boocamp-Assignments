@@ -1,4 +1,4 @@
-package com.bootcampzapien.assignment_1;
+package com.bootcampzapien.assignment_3;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

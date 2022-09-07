@@ -1,10 +1,8 @@
-package com.bootcampzapien.assignment_1.errorHandler;
+package com.bootcampzapien.assignment_3.errorHandler;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor

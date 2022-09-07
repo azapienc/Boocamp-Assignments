@@ -1,7 +1,7 @@
-package com.bootcampzapien.assignment_1.mapper;
+package com.bootcampzapien.assignment_3.mapper;
 
-import com.bootcampzapien.assignment_1.dto.RequestDto;
-import com.bootcampzapien.assignment_1.dto.ResponseDto;
+import com.bootcampzapien.assignment_3.dto.RequestDto;
+import com.bootcampzapien.assignment_3.dto.ResponseDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

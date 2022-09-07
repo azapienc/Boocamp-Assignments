@@ -1,4 +1,4 @@
-package com.bootcampzapien.assignment_1;
+package com.bootcampzapien.assignment_3;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
