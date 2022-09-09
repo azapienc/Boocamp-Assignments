@@ -31,6 +31,18 @@ public class EmployeeController {
     }
 
     /**
+     * Creates a new employee without any validation, for testing purposes only
+     *
+     * @param requestDto
+     * @return Created employee
+     */
+    @PostMapping("createEmployeeWithoutValidation")
+    @Validated
+    public Mono<ResponseDto> createEmployeeWithoutValidation(@RequestBody RequestDto requestDto) {
+        return this.employeeService.createEmployee(requestDto);
+    }
+
+    /**
      * Look for users with matching skills
      *
      * @param requestDto

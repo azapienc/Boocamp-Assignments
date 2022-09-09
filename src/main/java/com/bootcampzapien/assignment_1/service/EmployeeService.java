@@ -64,6 +64,7 @@ public class EmployeeService {
      * @throws BootcampExperienceException
      */
     public Flux<RequestDto> findEmpSkillset(RequestDto requestDto) throws BootcampExperienceException {
+        log.info("Finding users with matching skills");
         return getSkillSet(requestDto)
                 .flatMap(skill -> employeeDataRepository
                         .findById(skill.getEmpId())
